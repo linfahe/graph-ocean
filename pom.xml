@@ -26,6 +26,22 @@
     </properties>
 
     <dependencies>
+        <!--  解决 无 Cannot resolve symbol 'javafx' 包问题      -->
+        <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-base
+        java: 程序包javafx.util不存在 -->
+        <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-base -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>17</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.3</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
         <dependency>
             <groupId>com.google.guava</groupId>

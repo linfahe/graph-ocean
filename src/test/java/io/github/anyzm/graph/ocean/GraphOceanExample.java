@@ -40,13 +40,13 @@ public class GraphOceanExample {
 
     private static int nebulaPoolTimeout = 300000;
 
-    private static String nebulaCluster = "10.220.193.183:9669";
+    private static String nebulaCluster = "192.168.0.101:9669";
 
     private static String userName = "root";
 
     private static String password = "nebula";
 
-    private static String space = "test";
+    private static String space = "first_space";
 
     public static NebulaPoolConfig nebulaPoolConfig() {
         NebulaPoolConfig nebulaPoolConfig = new NebulaPoolConfig();
@@ -92,21 +92,22 @@ public class GraphOceanExample {
         User user = new User("UR123", "张三");
         //保存顶点
         int i = nebulaGraphMapper.saveVertexEntities(Lists.newArrayList(user));
+        System.out.println("i = " + i);
         //查询顶点
-        List<User> users = nebulaGraphMapper.fetchVertexTag(User.class, "UR123");
-        //保存边和查询边类似
-        Follow follow = new Follow("UR123", "UR234", 1);
-        //保存边
-        nebulaGraphMapper.saveEdgeEntities(Lists.newArrayList(follow));
-        //查询出边
-        List<Follow> follows = nebulaGraphMapper.goOutEdge(Follow.class, "UR123");
-        //查询反向边
-        List<Follow> fans = nebulaGraphMapper.goReverseEdge(Follow.class, "UR123");
-        //查询API
-        VertexQuery queryUserName = NebulaVertexQuery.build().fetchPropOn(User.class, "UR123")
-                .yield(User.class,"userName");
-        QueryResult rows = nebulaGraphMapper.executeQuery(queryUserName);
-        System.out.println(rows);
+//        List<User> users = nebulaGraphMapper.fetchVertexTag(User.class, "UR123");
+//        //保存边和查询边类似
+//        Follow follow = new Follow("UR123", "UR234", 1);
+//        //保存边
+//        nebulaGraphMapper.saveEdgeEntities(Lists.newArrayList(follow));
+//        //查询出边
+//        List<Follow> follows = nebulaGraphMapper.goOutEdge(Follow.class, "UR123");
+//        //查询反向边
+//        List<Follow> fans = nebulaGraphMapper.goReverseEdge(Follow.class, "UR123");
+//        //查询API
+//        VertexQuery queryUserName = NebulaVertexQuery.build().fetchPropOn(User.class, "UR123")
+//                .yield(User.class,"userName");
+//        QueryResult rows = nebulaGraphMapper.executeQuery(queryUserName);
+//        System.out.println(rows);
     }
 
     @GraphVertex(value = "user", keyPolicy = GraphKeyPolicy.string_key)
