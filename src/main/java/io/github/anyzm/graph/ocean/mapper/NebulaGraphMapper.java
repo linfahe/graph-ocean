@@ -179,7 +179,9 @@ public class NebulaGraphMapper implements GraphMapper {
             NebulaSessionWrapper session = null;
             try {
                 session = nebulaPoolSessionManager.getSession();
-                int execute = session.execute(String.format(SQL, space, sql));
+                String formatSql = String.format(SQL, space, sql);
+                log.info("nebula execute sql: {}",formatSql);
+                int execute = session.execute(formatSql);
                 CheckThrower.ifTrueThrow(execute != 0, ErrorEnum.UPDATE_NEBULA_EROR);
             } finally {
                 if (session != null) {

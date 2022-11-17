@@ -21,6 +21,7 @@ import org.apache.commons.collections.CollectionUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 批量顶点更新引擎
@@ -30,7 +31,10 @@ import java.util.Set;
  */
 public class NebulaBatchVertexUpdate<T> implements VertexUpdateEngine {
 
-    private static final String VERTEX_UPSET_SQL = "UPSERT VERTEX %s SET %s";
+    /**
+     * nebula> INSERT VERTEX t2 (name, age) VALUES "13":("n3", 12), "14":("n4", 8);
+     */
+    private static final String VERTEX_UPSET_SQL = "INSERT VERTEX %s ( %s )  VALUES %s:(%s) ";
 
     private List<GraphVertexEntity<T>> graphVertexEntities;
 
@@ -66,22 +70,29 @@ public class NebulaBatchVertexUpdate<T> implements VertexUpdateEngine {
     }
 
     private String generateUpsetSql(GraphVertexEntity graphVertexEntity) throws NebulaException {
-        Set<Map.Entry<String, Object>> entries = graphVertexEntity.getProps().entrySet();
         String queryId = GraphHelper.getQueryId(this.graphVertexType, graphVertexEntity.getId());
         StringBuilder builder = new StringBuilder();
         Map<String, GraphDataTypeEnum> dataTypeMap = graphVertexEntity.getGraphVertexType().getDataTypeMap();
-        for (Map.Entry<String, Object> entry : entries) {
-            GraphDataTypeEnum graphDataTypeEnum = dataTypeMap.get(entry.getKey());
-            if (GraphDataTypeEnum.STRING.equals(graphDataTypeEnum)) {
-                builder.append(',').append(this.graphVertexType.getVertexName()).append('.')
-                        .append(entry.getKey()).append("=\"").append(entry.getValue()).append("\"");
+        // nebula> INSERT VERTEX t2 (name, age) VALUES "13":("n3", 12), "14":("n4", 8);
+        // INSERT VERTEX %s ( %s )  VALUES %s:(%s)
+        // 获取 所有的属性
+        String fields = graphVertexType.getMustFields().stream().collect(Collectors.joining(","));
+        // 拼接 value
+        Map<String, Object> entityProps = graphVertexEntity.getProps();
+        for (String fieldName : graphVertexType.getMustFields()) {
+            GraphDataTypeEnum graphDataTypeEnum = dataTypeMap.get(fieldName);
+            if (entityProps.containsKey(fieldName)) {
+                if (GraphDataTypeEnum.STRING.equals(graphDataTypeEnum)) {
+                    builder.append(',').append(" \"").append(entityProps.get(fieldName)).append("\"");
+                } else {
+                    builder.append(',').append(entityProps.get(fieldName));
+                }
             } else {
-                builder.append(',').append(this.graphVertexType.getVertexName()).append('.')
-                        .append(entry.getKey()).append("=").append(entry.getValue());
+                builder.append(",NULL");
             }
         }
         String sqlSet = builder.delete(0, 1).toString();
-        return String.format(VERTEX_UPSET_SQL, queryId, sqlSet);
+        return String.format(VERTEX_UPSET_SQL, graphVertexEntity.getGraphVertexType().getVertexName(), fields, queryId, sqlSet);
     }
 
 
