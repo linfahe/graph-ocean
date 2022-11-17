@@ -14,9 +14,7 @@ import com.vesoft.nebula.client.graph.net.NebulaPool;
 import io.github.anyzm.graph.ocean.annotation.GraphEdge;
 import io.github.anyzm.graph.ocean.annotation.GraphProperty;
 import io.github.anyzm.graph.ocean.annotation.GraphVertex;
-import io.github.anyzm.graph.ocean.domain.VertexQuery;
 import io.github.anyzm.graph.ocean.domain.impl.QueryResult;
-import io.github.anyzm.graph.ocean.engine.NebulaVertexQuery;
 import io.github.anyzm.graph.ocean.enums.GraphDataTypeEnum;
 import io.github.anyzm.graph.ocean.enums.GraphKeyPolicy;
 import io.github.anyzm.graph.ocean.enums.GraphPropertyTypeEnum;
@@ -34,7 +32,7 @@ import java.util.List;
  * @Author ZhaoLai Huang
  * created by ZhaoLai Huang on 2022/4/10
  */
-public class GraphOceanExample {
+public class GraphOceanExample2 {
 
     static {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -103,86 +101,99 @@ public class GraphOceanExample {
         NebulaGraphMapper nebulaGraphMapper = nebulaGraphMapper(nebulaPoolSessionManager(
                 nebulaPool(nebulaPoolConfig())));
 //        QueryResult records = nebulaGraphMapper.executeQuerySql("match (n) return n limit 100;");
-        QueryResult records = nebulaGraphMapper.executeQuerySql(" MATCH (m)<-[r:in_group]-(n) WHERE id(m)==\"956728735\" RETURN m,r,n;");
-        System.out.println("records = \n " + records);
-
-//        User user = new User("UR123", null);
-//        user.setUserAge(123);
-//        User user2 = new User("UR234", null);
-//        user2.setUserAge(123L);
-//        保存顶点
-//        int i = nebulaGraphMapper.saveVertexEntities(Lists.newArrayList( user2));
-//        System.out.println("i = " + i);
-        //查询顶点
-//        List<User> users = nebulaGraphMapper.fetchVertexTag(User.class, "UR123");
-//        System.out.println("users = " + users);
-//        保存边和查询边类似
-//        Follow follow = new Follow("UR123", "UR234", 1);
-//        follow.setUserRankId(123L);
-//        System.out.println("follow = " + follow);
-        //保存边
-//        int i2 = nebulaGraphMapper.saveEdgeEntities(Lists.newArrayList(follow));
-//        System.out.println("i2 = " + i2);
-//        //查询出边
-//        List<Follow> follows = nebulaGraphMapper.goOutEdge(Follow.class, "UR123");
-//        System.out.println("follows = " + follows);
-//        //查询反向边
-//        List<Follow> fans = nebulaGraphMapper.goReverseEdge(Follow.class, "UR123");
-//        //查询API
-//        VertexQuery queryUserName = NebulaVertexQuery.build().fetchPropOn(User.class, "UR123")
-//                .yield(User.class,"userName");
-//        QueryResult rows = nebulaGraphMapper.executeQuery(queryUserName);
-//        System.out.println(rows);
+//        QueryResult records = nebulaGraphMapper.executeQuerySql(" MATCH (m)<-[r:in_group]-(n:qq) WHERE id(m)==\"956728735\" RETURN id(n) as qqId , n.qq.nick_name as qqNickName;");
+//        System.out.println("records = \n " + records);
+        List<QqVo> qqVos = nebulaGraphMapper.executeQuerySql("  MATCH (m)<-[r:in_group]-(n:qq) WHERE id(m)==\"956728735\" RETURN id(n) as qqId , n.qq.nick_name as qqNickName,id(m) as qqGroupId,m.qq_group.name as qqGroupName,r.in_group_remark as inGroupRemark;", QqVo.class);
+        System.out.println("qqVos = \n" + JSONObject.toJSONString(qqVos));
+        List<Qq> qqs = nebulaGraphMapper.fetchVertexTag(Qq.class, "3419559904");
+        System.out.println("qqs = " + qqs);
     }
 
-    @GraphVertex(value = "user", keyPolicy = GraphKeyPolicy.string_key)
     @Data
-    public static class User {
-        @GraphProperty(value = "user_no", required = true,
+    public static class QqVo {
+        private String qqId;
+        private String qqNickName;
+
+        private String qqGroupId;
+        private String qqGroupName;
+
+        private String inGroupRemark;
+
+    }
+
+    @GraphVertex(value = "qq", keyPolicy = GraphKeyPolicy.string_key)
+    @Data
+    public static class Qq {
+        @GraphProperty(value = "account", required = true,
                 propertyTypeEnum = GraphPropertyTypeEnum.GRAPH_VERTEX_ID, dataType = GraphDataTypeEnum.STRING)
-        private String userNo;
-        @GraphProperty(value = "user_name", required = true, dataType = GraphDataTypeEnum.STRING)
-        private String userName;
-        @GraphProperty(value = "user_age", required = true, dataType = GraphDataTypeEnum.INT)
-        private Long userAge;
-        @GraphProperty(value = "user_rank_id", required = true, dataType = GraphDataTypeEnum.INT, propertyTypeEnum = GraphPropertyTypeEnum.GRAPH_EDGE_RANK_ID)
-        private Long userRankId;
+        private String account;
+        @GraphProperty(value = "name", required = true, dataType = GraphDataTypeEnum.STRING)
+        private String name;
+        @GraphProperty(value = "nick_name", required = true, dataType = GraphDataTypeEnum.STRING)
+        private String nickName;
 
-
-        public User() {
+        public Qq() {
         }
 
-        public User(String userNo, String userName) {
-            this.userNo = userNo;
-            this.userName = userName;
+        public Qq(String account, String name, String nickName) {
+            this.account = account;
+            this.name = name;
+            this.nickName = nickName;
         }
 
     }
 
-    @GraphEdge(value = "follow", srcVertex = User.class, dstVertex = User.class, rankIdAsField = false)
+    @GraphVertex(value = "qq_group", keyPolicy = GraphKeyPolicy.string_key)
     @Data
-    public static class Follow {
-        @GraphProperty(value = "user_no1", required = false,
+    public static class QqGroup {
+        @GraphProperty(value = "account", required = true,
+                propertyTypeEnum = GraphPropertyTypeEnum.GRAPH_VERTEX_ID, dataType = GraphDataTypeEnum.STRING)
+        private String account;
+        @GraphProperty(value = "name", required = true, dataType = GraphDataTypeEnum.STRING)
+        private String name;
+        @GraphProperty(value = "g_desc", required = true, dataType = GraphDataTypeEnum.STRING)
+        private String gDesc;
+
+        public QqGroup() {
+        }
+
+        public QqGroup(String account, String name, String gDesc) {
+            this.account = account;
+            this.name = name;
+            this.gDesc = gDesc;
+        }
+
+    }
+
+    @GraphEdge(value = "in_group", srcVertex = Qq.class, dstVertex = QqGroup.class, rankIdAsField = false
+            , srcIdAsField = false, dstIdAsField = false)
+    @Data
+    public static class InGroup {
+        @GraphProperty(value = "src_id", required = false,
                 propertyTypeEnum = GraphPropertyTypeEnum.GRAPH_EDGE_SRC_ID, dataType = GraphDataTypeEnum.STRING)
-        private String userNo1;
-        @GraphProperty(value = "user_no2", required = false,
+        private String srcId;
+        @GraphProperty(value = "dst_id", required = false,
                 propertyTypeEnum = GraphPropertyTypeEnum.GRAPH_EDGE_DST_ID, dataType = GraphDataTypeEnum.STRING)
-        private String userNo2;
-        @GraphProperty(value = "follow_type", required = true, dataType = GraphDataTypeEnum.INT)
-        private Long followType;
+        private String dstId;
+        @GraphProperty(value = "in_group_flag", required = true, dataType = GraphDataTypeEnum.BOOLEAN)
+        private Boolean inGroupFlag;
+        @GraphProperty(value = "in_group_remark", required = true, dataType = GraphDataTypeEnum.STRING)
+        private String inGroupRemark;
 
         @GraphProperty(value = "user_rank_id", required = true, dataType = GraphDataTypeEnum.INT, propertyTypeEnum = GraphPropertyTypeEnum.GRAPH_EDGE_RANK_ID)
         private Long userRankId;
         // rank ：普通模式，只需要一个属性（针对于整形的数据）
         // rank ：redis计算，需要开始节点id、结束节点id、关系、字符串属性[长字符串建议md5使用] （针对于字符串的去重 rank）
 
-        public Follow() {
+        public InGroup() {
         }
 
-        public Follow(String userNo1, String userNo2, Long followType) {
-            this.userNo1 = userNo1;
-            this.userNo2 = userNo2;
-            this.followType = followType;
+        public InGroup(String srcId, String dstId, Boolean inGroupFlag, String inGroupRemark, Long userRankId) {
+            this.srcId = srcId;
+            this.dstId = dstId;
+            this.inGroupFlag = inGroupFlag;
+            this.inGroupRemark = inGroupRemark;
+            this.userRankId = userRankId;
         }
     }
 
