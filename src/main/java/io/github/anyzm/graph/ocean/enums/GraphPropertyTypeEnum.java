@@ -21,12 +21,15 @@ public enum GraphPropertyTypeEnum {
      */
     GRAPH_EDGE_DST_ID,
     /**
-     * 边顶点id
+     * 顶点id
      */
     GRAPH_VERTEX_ID,
     /**
      * 普通属性
      */
-    ORDINARY_PROPERTY;
-
+    ORDINARY_PROPERTY,
+    /**
+     * 边 rank-id
+     */
+    GRAPH_EDGE_RANK_ID;
 }

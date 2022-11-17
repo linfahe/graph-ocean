@@ -6,6 +6,7 @@
 package io.github.anyzm.graph.ocean.domain;
 
 import io.github.anyzm.graph.ocean.dao.GraphValueFormatter;
+import io.github.anyzm.graph.ocean.domain.impl.GraphEdgeTypeBuilder;
 import io.github.anyzm.graph.ocean.domain.impl.GraphVertexType;
 import io.github.anyzm.graph.ocean.enums.GraphDataTypeEnum;
 import io.github.anyzm.graph.ocean.enums.GraphKeyPolicy;
@@ -110,6 +111,14 @@ public interface GraphLabelBuilder {
      * @return 标签构造器
      */
     public GraphLabelBuilder dstIdAsField(boolean dstIdAsField);
+
+    /**
+     * 构造目标id是否作为字段
+     *
+     * @param rankIdAsField rank-id是否作为字段
+     * @return 标签构造器
+     */
+    public GraphLabelBuilder rankIdAsField(boolean rankIdAsField);
 
     /**
      * 构造起点id值格式转化器

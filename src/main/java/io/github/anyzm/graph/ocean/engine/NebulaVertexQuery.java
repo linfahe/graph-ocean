@@ -85,7 +85,7 @@ public class NebulaVertexQuery implements VertexQuery {
 
     @Override
     public VertexQuery yield(String symbol, Class clazz, String... fields) {
-        NebulaQueryUtils.yield(graphTypeManager, sqlBuilder, symbol, clazz, fields);
+        NebulaQueryUtils.yield2(graphTypeManager, sqlBuilder, symbol, clazz, fields);
         return this;
     }
 

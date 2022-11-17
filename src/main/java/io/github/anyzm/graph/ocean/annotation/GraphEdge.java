@@ -48,4 +48,10 @@ public @interface GraphEdge {
      */
     boolean dstIdAsField() default true;
 
+    /**
+     *
+     * @return rank-id是否作为字段
+     */
+    boolean rankIdAsField() default true;
+
 }

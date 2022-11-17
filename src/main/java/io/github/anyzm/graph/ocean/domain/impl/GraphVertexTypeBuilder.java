@@ -98,6 +98,11 @@ public class GraphVertexTypeBuilder implements GraphLabelBuilder {
     }
 
     @Override
+    public GraphLabelBuilder rankIdAsField(boolean rankIdAsField) {
+        return this;
+    }
+
+    @Override
     public GraphVertexTypeBuilder srcIdValueFormatter(GraphValueFormatter srcIdValueFormatter) {
         return this;
     }

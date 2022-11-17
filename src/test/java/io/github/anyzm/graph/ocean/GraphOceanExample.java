@@ -1,5 +1,7 @@
 package io.github.anyzm.graph.ocean;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
 import com.google.common.collect.Lists;
 import com.vesoft.nebula.client.graph.NebulaPoolConfig;
 import com.vesoft.nebula.client.graph.data.HostAddress;
@@ -21,6 +23,7 @@ import io.github.anyzm.graph.ocean.mapper.NebulaGraphMapper;
 import io.github.anyzm.graph.ocean.session.NebulaPoolSessionManager;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
@@ -31,6 +34,14 @@ import java.util.List;
  * created by ZhaoLai Huang on 2022/4/10
  */
 public class GraphOceanExample {
+
+    static {
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        List<ch.qos.logback.classic.Logger> loggerList = loggerContext.getLoggerList();
+        loggerList.forEach(logger -> {
+            logger.setLevel(Level.DEBUG);
+        });
+    }
 
     private static int nebulaPoolMaxConnSize = 1000;
 
@@ -89,18 +100,28 @@ public class GraphOceanExample {
     public static void main(String[] args) throws UnknownHostException, UnsupportedEncodingException, IllegalAccessException, InstantiationException, ClientServerIncompatibleException, AuthFailedException, NotValidConnectionException, IOErrorException {
         NebulaGraphMapper nebulaGraphMapper = nebulaGraphMapper(nebulaPoolSessionManager(
                 nebulaPool(nebulaPoolConfig())));
-        User user = new User("UR123", "张三");
-        //保存顶点
-        int i = nebulaGraphMapper.saveVertexEntities(Lists.newArrayList(user));
-        System.out.println("i = " + i);
+        QueryResult records = nebulaGraphMapper.executeQuerySql("match (n) return n limit 100;");
+        System.out.println("records = " + records);
+//        User user = new User("UR123", null);
+//        user.setUserAge(123);
+//        User user2 = new User("UR234", null);
+//        user2.setUserAge(123L);
+//        保存顶点
+//        int i = nebulaGraphMapper.saveVertexEntities(Lists.newArrayList( user2));
+//        System.out.println("i = " + i);
         //查询顶点
 //        List<User> users = nebulaGraphMapper.fetchVertexTag(User.class, "UR123");
-//        //保存边和查询边类似
+//        System.out.println("users = " + users);
+//        保存边和查询边类似
 //        Follow follow = new Follow("UR123", "UR234", 1);
-//        //保存边
-//        nebulaGraphMapper.saveEdgeEntities(Lists.newArrayList(follow));
+//        follow.setUserRankId(123L);
+//        System.out.println("follow = " + follow);
+        //保存边
+//        int i2 = nebulaGraphMapper.saveEdgeEntities(Lists.newArrayList(follow));
+//        System.out.println("i2 = " + i2);
 //        //查询出边
 //        List<Follow> follows = nebulaGraphMapper.goOutEdge(Follow.class, "UR123");
+//        System.out.println("follows = " + follows);
 //        //查询反向边
 //        List<Follow> fans = nebulaGraphMapper.goReverseEdge(Follow.class, "UR123");
 //        //查询API
@@ -114,10 +135,15 @@ public class GraphOceanExample {
     @Data
     public static class User {
         @GraphProperty(value = "user_no", required = true,
-                propertyTypeEnum = GraphPropertyTypeEnum.GRAPH_VERTEX_ID)
+                propertyTypeEnum = GraphPropertyTypeEnum.GRAPH_VERTEX_ID, dataType = GraphDataTypeEnum.STRING)
         private String userNo;
-        @GraphProperty(value = "user_name", required = true)
+        @GraphProperty(value = "user_name", required = true, dataType = GraphDataTypeEnum.STRING)
         private String userName;
+        @GraphProperty(value = "user_age", required = true, dataType = GraphDataTypeEnum.INT)
+        private Long userAge;
+        @GraphProperty(value = "user_rank_id", required = true, dataType = GraphDataTypeEnum.INT, propertyTypeEnum = GraphPropertyTypeEnum.GRAPH_EDGE_RANK_ID)
+        private Long userRankId;
+
 
         public User() {
         }
@@ -126,24 +152,30 @@ public class GraphOceanExample {
             this.userNo = userNo;
             this.userName = userName;
         }
+
     }
 
-    @GraphEdge(value = "follow", srcVertex = User.class, dstVertex = User.class)
+    @GraphEdge(value = "follow", srcVertex = User.class, dstVertex = User.class, rankIdAsField = false)
     @Data
     public static class Follow {
-        @GraphProperty(value = "user_no1", required = true,
-                propertyTypeEnum = GraphPropertyTypeEnum.GRAPH_EDGE_SRC_ID)
+        @GraphProperty(value = "user_no1", required = false,
+                propertyTypeEnum = GraphPropertyTypeEnum.GRAPH_EDGE_SRC_ID, dataType = GraphDataTypeEnum.STRING)
         private String userNo1;
-        @GraphProperty(value = "user_no2", required = true,
-                propertyTypeEnum = GraphPropertyTypeEnum.GRAPH_EDGE_DST_ID)
+        @GraphProperty(value = "user_no2", required = false,
+                propertyTypeEnum = GraphPropertyTypeEnum.GRAPH_EDGE_DST_ID, dataType = GraphDataTypeEnum.STRING)
         private String userNo2;
         @GraphProperty(value = "follow_type", required = true, dataType = GraphDataTypeEnum.INT)
-        private Integer followType;
+        private Long followType;
+
+        @GraphProperty(value = "user_rank_id", required = true, dataType = GraphDataTypeEnum.INT, propertyTypeEnum = GraphPropertyTypeEnum.GRAPH_EDGE_RANK_ID)
+        private Long userRankId;
+        // rank ：普通模式，只需要一个属性（针对于整形的数据）
+        // rank ：redis计算，需要开始节点id、结束节点id、关系、字符串属性[长字符串建议md5使用] （针对于字符串的去重 rank）
 
         public Follow() {
         }
 
-        public Follow(String userNo1, String userNo2, Integer followType) {
+        public Follow(String userNo1, String userNo2, Long followType) {
             this.userNo1 = userNo1;
             this.userNo2 = userNo2;
             this.followType = followType;

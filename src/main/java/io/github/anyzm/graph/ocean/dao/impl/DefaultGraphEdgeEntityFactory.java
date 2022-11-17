@@ -65,6 +65,11 @@ public class DefaultGraphEdgeEntityFactory implements GraphEdgeEntityFactory {
                     continue;
                 }
             }
+            if (graphProperty.propertyTypeEnum().equals(GraphPropertyTypeEnum.GRAPH_EDGE_RANK_ID)) {
+                if (!graphEdgeType.isRankIdAsField()) {
+                    continue;
+                }
+            }
             if (value != null) {
                 propertyMap.put(graphProperty.value(), value);
             }
@@ -91,6 +96,7 @@ public class DefaultGraphEdgeEntityFactory implements GraphEdgeEntityFactory {
         String dstId = null;
         //所有属性与值
         Map<String, Object> propertyMap = Maps.newHashMapWithExpectedSize(declaredFields.length);
+        long rankId = collectEdgeEntityRankId(input, declaredFields, graphEdgeType, propertyMap);
         Pair<String, String> idPair = collectEdgeEntityProperties(input, declaredFields, graphEdgeType, propertyMap);
         srcId = StringUtils.isNotBlank(idPair.getKey()) ? idPair.getKey() : srcId;
         dstId = StringUtils.isNotBlank(idPair.getValue()) ? idPair.getValue() : dstId;
@@ -104,6 +110,22 @@ public class DefaultGraphEdgeEntityFactory implements GraphEdgeEntityFactory {
         }
         CheckThrower.ifTrueThrow(StringUtils.isBlank(srcId) || StringUtils.isBlank(dstId),
                 ErrorEnum.INVALID_ID);
-        return new GraphEdgeEntity(graphEdgeType, srcId, dstId, srcVertexType, dstVertexType, propertyMap);
+        return new GraphEdgeEntity(graphEdgeType, srcId, dstId, rankId, srcVertexType, dstVertexType, propertyMap);
+    }
+
+    private <S, T, E> long collectEdgeEntityRankId(E input, Field[] declaredFields, GraphEdgeType<S, T, E> graphEdgeType, Map<String, Object> propertyMap) {
+        long rankId = 0L;
+        for (Field declaredField : declaredFields) {
+            declaredField.setAccessible(true);
+            GraphProperty graphProperty = declaredField.getAnnotation(GraphProperty.class);
+            if (graphProperty == null) {
+                continue;
+            }
+            Object value = GraphHelper.formatFieldValue(declaredField, graphProperty, input, graphEdgeType);
+            if (graphProperty.propertyTypeEnum().equals(GraphPropertyTypeEnum.GRAPH_EDGE_RANK_ID)) {
+                return value != null && (Long) value > 0 ? (Long) value : rankId;
+            }
+        }
+        return rankId;
     }
 }

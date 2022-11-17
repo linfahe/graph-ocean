@@ -49,6 +49,7 @@ public class DefaultGraphEdgeTypeFactory implements GraphEdgeTypeFactory {
         String edgeName = graphEdge.value();
         boolean srcIdAsField = graphEdge.srcIdAsField();
         boolean dstIdAsField = graphEdge.dstIdAsField();
+        boolean rankIdAsField = graphEdge.rankIdAsField();
         //字段类型
         Map<String, GraphDataTypeEnum> dataTypeMap = Maps.newHashMap();
         if (srcGraphVertexType == null) {
@@ -62,7 +63,7 @@ public class DefaultGraphEdgeTypeFactory implements GraphEdgeTypeFactory {
         CheckThrower.ifTrueThrow(srcGraphVertexType == null || dstGraphVertexType == null, ErrorEnum.INVALID_VERTEX_TAG);
         GraphEdgeTypeBuilder builder = GraphEdgeTypeBuilder.builder();
         GraphHelper.collectGraphProperties(builder, clazz, srcIdAsField, dstIdAsField);
-        return builder.srcIdAsField(srcIdAsField).dstIdAsField(dstIdAsField).graphLabelName(edgeName)
+        return builder.srcIdAsField(srcIdAsField).dstIdAsField(dstIdAsField).rankIdAsField(rankIdAsField).graphLabelName(edgeName)
                 .labelClass(clazz).srcGraphVertexType(srcGraphVertexType).dstGraphVertexType(dstGraphVertexType).build();
     }
 }

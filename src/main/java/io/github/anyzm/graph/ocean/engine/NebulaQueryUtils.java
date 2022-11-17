@@ -48,10 +48,10 @@ public class NebulaQueryUtils {
     }
 
     public static void yield(GraphTypeManager graphTypeManager, StringBuilder sqlBuilder, Class clazz, String... fields) {
-        yield(graphTypeManager, sqlBuilder, null, clazz, fields);
+        yield2(graphTypeManager, sqlBuilder, null, clazz, fields);
     }
 
-    public static void yield(GraphTypeManager graphTypeManager, StringBuilder sqlBuilder, String symbol, Class clazz, String... fields) {
+    public static void yield2(GraphTypeManager graphTypeManager, StringBuilder sqlBuilder, String symbol, Class clazz, String... fields) {
         yieldWithDistinct(false, graphTypeManager, sqlBuilder, symbol, clazz, fields);
     }
 

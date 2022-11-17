@@ -42,6 +42,8 @@ public class GraphEdgeType<S, T, E> extends AbstractGraphLabel {
 
     private boolean dstIdAsField;
 
+    private boolean rankIdAsField;
+
     private GraphValueFormatter srcIdValueFormatter;
 
     private GraphValueFormatter dstIdValueFormatter;

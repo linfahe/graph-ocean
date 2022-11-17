@@ -33,7 +33,7 @@ import java.util.Set;
  */
 public class NebulaBatchEdgesUpdate<S, T, E> implements EdgeUpdateEngine<S, T, E> {
 
-    private static final String UPSET_SQL_FORMAT = "UPSERT EDGE %s->%s of %s SET %s";
+    private static final String UPSET_SQL_FORMAT = "UPSERT EDGE on  %s %s->%s @%d SET %s";
 
     /**
      * 仅生成边的更新sql
@@ -138,13 +138,13 @@ public class NebulaBatchEdgesUpdate<S, T, E> implements EdgeUpdateEngine<S, T, E
         for (Map.Entry<String, Object> entry : entries) {
             GraphDataTypeEnum graphDataTypeEnum = dataTypeMap.get(entry.getKey());
             if (GraphDataTypeEnum.STRING.equals(graphDataTypeEnum)) {
-                sqlBuilder.append(",").append(entry.getKey()).append("=\"").append(entry.getValue()).append("\"");
+                sqlBuilder.append(",").append(entry.getKey()).append("= \"").append(entry.getValue()).append("\" ");
             } else {
                 sqlBuilder.append(",").append(entry.getKey()).append("=").append(entry.getValue());
             }
         }
         String sqlFieldSet = sqlBuilder.delete(0, 1).toString();
-        return String.format(UPSET_SQL_FORMAT, src, end, graphEdgeEntity.getGraphEdgeType().getEdgeName(), sqlFieldSet);
+        return String.format(UPSET_SQL_FORMAT, graphEdgeEntity.getGraphEdgeType().getEdgeName(), src, end, graphEdgeEntity.getRankId(), sqlFieldSet);
     }
 
 

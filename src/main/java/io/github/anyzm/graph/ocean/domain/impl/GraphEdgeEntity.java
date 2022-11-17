@@ -32,6 +32,11 @@ public class GraphEdgeEntity<S, T, E> extends GraphPropertyEntity implements Gra
      */
     private final String dstId;
 
+    /**
+     * rankId
+     */
+    private long rankId = 0L;
+
     private final GraphEdgeType<S, T, E> graphEdgeType;
 
     /**
@@ -78,7 +83,7 @@ public class GraphEdgeEntity<S, T, E> extends GraphPropertyEntity implements Gra
                 Objects.equal(endVertex, graphRelation.getDstVertexType());
     }
 
-    public GraphEdgeEntity(GraphEdgeType<S, T, E> graphEdgeType, String srcId, String dstId,
+    public GraphEdgeEntity(GraphEdgeType<S, T, E> graphEdgeType, String srcId, String dstId, long rankId,
                            GraphVertexType<S> srcVertex, GraphVertexType<T> dstVertex, Map<String, Object> props) {
         super(props);
         this.graphEdgeType = graphEdgeType;
@@ -86,6 +91,7 @@ public class GraphEdgeEntity<S, T, E> extends GraphPropertyEntity implements Gra
         this.dstId = dstId;
         this.srcVertexType = srcVertex;
         this.dstVertexType = dstVertex;
+        this.rankId = rankId;
     }
 
     public GraphEdgeEntity(GraphEdgeType<S, T, E> graphEdgeType, String srcId,

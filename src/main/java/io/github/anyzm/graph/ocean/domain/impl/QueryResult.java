@@ -107,7 +107,8 @@ public class QueryResult implements Iterable<ResultSet.Record>, Serializable {
         List<Field> fieldsList = FieldUtils.listFields(clazz);
         for (Field field : fieldsList) {
             GraphProperty annotation = field.getAnnotation(GraphProperty.class);
-            String key = annotation != null ? annotation.value() : field.getName();
+//            String key = annotation != null ? annotation.value() : field.getName();
+            String key = field.getName();
             if (record.contains(key)) {
                 ValueWrapper valueWrapper = record.get(key);
                 if (!valueWrapper.isNull()) {

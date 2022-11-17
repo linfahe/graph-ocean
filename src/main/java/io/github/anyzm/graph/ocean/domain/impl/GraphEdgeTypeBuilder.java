@@ -101,6 +101,12 @@ public class GraphEdgeTypeBuilder implements GraphLabelBuilder {
     }
 
     @Override
+    public GraphEdgeTypeBuilder rankIdAsField(boolean rankIdAsField) {
+        this.graphEdgeType.setRankIdAsField(rankIdAsField);
+        return this;
+    }
+
+    @Override
     public GraphEdgeTypeBuilder srcIdValueFormatter(GraphValueFormatter srcIdValueFormatter) {
         this.graphEdgeType.setSrcIdValueFormatter(srcIdValueFormatter);
         return this;

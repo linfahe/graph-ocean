@@ -21,7 +21,7 @@
         <lombok.version>1.18.12</lombok.version>
         <beanutils.version>1.9.4</beanutils.version>
         <commons-lang3.version>3.8.1</commons-lang3.version>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
         <guava.version>30.1.1-jre</guava.version>
     </properties>
 
@@ -36,11 +36,25 @@
             <version>17</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
+<!--        <dependency>-->
+<!--            <groupId>org.slf4j</groupId>-->
+<!--            <artifactId>slf4j-simple</artifactId>-->
+<!--            <version>2.0.3</version>-->
+<!--        </dependency>-->
+        <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>2.0.3</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.4.4</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <version>2.7.5</version>
+            <scope>provided</scope>
+        </dependency>
+
 
         <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
         <dependency>
