@@ -18,7 +18,7 @@
         <nebula-java.version>3.0.0</nebula-java.version>
         <fastjson.verson>1.2.79</fastjson.verson>
         <log4j-api.version>2.11.2</log4j-api.version>
-        <lombok.version>1.18.12</lombok.version>
+        <lombok.version>1.18.24</lombok.version>
         <beanutils.version>1.9.4</beanutils.version>
         <commons-lang3.version>3.8.1</commons-lang3.version>
         <java.version>17</java.version>
