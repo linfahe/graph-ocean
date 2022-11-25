@@ -4,13 +4,18 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.vesoft.nebula.Row;
 import com.vesoft.nebula.client.graph.NebulaPoolConfig;
 import com.vesoft.nebula.client.graph.data.HostAddress;
+import com.vesoft.nebula.client.graph.data.Node;
+import com.vesoft.nebula.client.graph.data.ResultSet;
+import com.vesoft.nebula.client.graph.data.ValueWrapper;
 import com.vesoft.nebula.client.graph.exception.AuthFailedException;
 import com.vesoft.nebula.client.graph.exception.ClientServerIncompatibleException;
 import com.vesoft.nebula.client.graph.exception.IOErrorException;
 import com.vesoft.nebula.client.graph.exception.NotValidConnectionException;
 import com.vesoft.nebula.client.graph.net.NebulaPool;
+import com.vesoft.nebula.graph.PlanDescription;
 import io.github.anyzm.graph.ocean.annotation.GraphEdge;
 import io.github.anyzm.graph.ocean.annotation.GraphProperty;
 import io.github.anyzm.graph.ocean.annotation.GraphVertex;
@@ -28,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -103,9 +109,51 @@ public class GraphOceanExample {
         NebulaGraphMapper nebulaGraphMapper = nebulaGraphMapper(nebulaPoolSessionManager(
                 nebulaPool(nebulaPoolConfig())));
 //        QueryResult records = nebulaGraphMapper.executeQuerySql("match (n) return n limit 100;");
-        QueryResult records = nebulaGraphMapper.executeQuerySql(" MATCH (m)<-[r:in_group]-(n) WHERE id(m)==\"956728735\" RETURN m,r,n;");
-        System.out.println("records = \n " + records);
+//        QueryResult records = nebulaGraphMapper.executeQuerySql(" MATCH (m)<-[r:in_group]-(n) WHERE id(m)==\"956728735\" RETURN m,r,n;");
+//        QueryResult records = nebulaGraphMapper.executeQuerySql("  MATCH p=(v)-[e:start_end|compound*1..10{craft:\"胺化还原法工艺\"}]->(v2) where id(v2)==\"甲基苯丙胺盐酸盐\"  RETURN p,v,e,v2 LIMIT 100");
+//        System.out.println("records = \n " + records);
 
+        ResultSet rs = nebulaPool(nebulaPoolConfig()).getSession("root", password, true).execute("use wu_yi;MATCH p=(v)-[e:start_end|compound*1..10{craft:\"胺化还原法工艺\"}]->(v2) where id(v2)==\"甲基苯丙胺盐酸盐\"  RETURN p,v,e,v2 LIMIT 100");
+        ResultSet.Record valueWrappers = rs.rowValues(1);
+        System.out.println("rs.colValues(\"p\") = " + rs.colValues("p"));
+        List<String> columnNames = rs.getColumnNames();
+        System.out.println("columnNames = " + columnNames);
+        String comment = rs.getComment();
+        System.out.println("rs.getComment() = " +comment );
+        long latency = rs.getLatency();
+        System.out.println("rs.getLatency() = " +latency );
+        int i = rs.rowsSize();
+        System.out.println("rs.rowsSize() = " +i);
+        PlanDescription planDesc = rs.getPlanDesc();
+        System.out.println("rs.getPlanDesc() = " + planDesc);
+        List<Row> rows = rs.getRows();
+        System.out.println("rs.getRows() = " +rows);
+        List<String> keys = rs.keys();
+        System.out.println("rs.keys() = " +keys);
+        System.out.println("valueWrappers = " + valueWrappers);
+        for (ValueWrapper valueWrapper : valueWrappers) {
+            System.out.println("valueWrapper = " + valueWrapper);
+            boolean vertex = valueWrapper.isVertex();
+            System.out.println("vertex = " + vertex);
+            if (vertex){
+                Node node = valueWrapper.asNode();
+                System.out.println("node = " + node);
+                ValueWrapper id = node.getId();
+                System.out.println("id = " + id);
+                List<String> labels = node.labels();
+                System.out.println("node.labels() = " +labels);
+                List<String> strings = node.tagNames();
+                System.out.println("strings = " + strings);
+                String decodeType = node.getDecodeType();
+                System.out.println("decodeType = " + decodeType);
+                boolean material = node.hasTagName("material");
+                System.out.println("material = " + material);
+                if (material){
+                    HashMap<String, ValueWrapper> material1 = node.properties("material");
+                    System.out.println("material1 = " + material1);
+                }
+            }
+        }
 //        User user = new User("UR123", null);
 //        user.setUserAge(123);
 //        User user2 = new User("UR234", null);
